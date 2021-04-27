@@ -111,7 +111,8 @@ class ContactTableViewController: UITableViewController {
     var filtercontactList = [Person]()
     var cacheImage = [String : UIImage]()
     var searchController = UISearchController(searchResultsController: nil)
-    var spinner = UIActivityIndicatorView(style: .gray)
+    var sectioncontactlist = [(Character,  [Person])]()
+    var currPerson = Person()
     
     var searchEmpty : Bool {
         return searchController.searchBar.text?.isEmpty ?? true
@@ -133,10 +134,25 @@ class ContactTableViewController: UITableViewController {
         DispatchQueue.global().async {
             Person().getContactList {[unowned self] (data) in
                 self.contactList = data
+                
+                self.sectioncontactlist = Dictionary(grouping: self.contactList) { (contact) -> Character in
+                    var fchar : Character?
+                    if let name = contact.name as? String{
+                        fchar = name.first!
+                    }
+                    return fchar!
+                    }
+                    .map { (key: Character, value: [Person]) -> (letter: Character, countries: [Person]) in
+                        (letter: key, countries: value)
+                    }
+                    .sorted { (left, right) -> Bool in
+                        left.letter < right.letter
+                }
+                
+                
+                
                 DispatchQueue.main.async {
-                    self.spinner.startAnimating()
                     self.tableView.reloadData()
-                    self.spinner.stopAnimating()
                 }
             }
         }
@@ -160,28 +176,43 @@ class ContactTableViewController: UITableViewController {
     }
 
     // MARK: - Table view data source
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        var headerTittle = String()
+        
+        if isfiltering {return ""}
+        
+        if let fchar = sectioncontactlist[section].0 as? Character,
+            let fname = String(fchar) as? String{
+            headerTittle = fname
+        }
+        return headerTittle
+    }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        if isfiltering {return 1}
+        return sectioncontactlist.count
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if isfiltering{
-            return filtercontactList.count
-        }
-        
-        return contactList.count
+        if isfiltering {return filtercontactList.count}
+        return sectioncontactlist[section].1.count
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "contactCell", for: indexPath) as! ContactTableViewCell
-        var contact = contactList[indexPath.row]
+        var contact = Person()
         
         if isfiltering{
             contact = filtercontactList[indexPath.row]
+        }else{
+            if let personArray = sectioncontactlist[indexPath.section].1 as? [Person],
+                let currPerson = personArray[indexPath.row] as? Person{
+                contact = currPerson
+            }
         }
-        
+
         if let name = contact.name as? String{
             cell.contactNameLabel.text = name
         }
@@ -208,6 +239,14 @@ class ContactTableViewController: UITableViewController {
             }
         }
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let personArray = sectioncontactlist[indexPath.section].1 as? [Person],
+            let person = personArray[indexPath.row] as? Person{
+            currPerson = person
+            performSegue(withIdentifier: "ShowContactDetails", sender: nil)
+        }   
     }
  
 
@@ -246,15 +285,16 @@ class ContactTableViewController: UITableViewController {
     }
     */
 
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+        if let vc = segue.destination as? ViewController{
+            vc.person = currPerson
+        }
     }
-    */
+    
 
 }
 
