@@ -13,6 +13,8 @@
 		FB315BEE26360A3800F032E8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FB315BED26360A3800F032E8 /* Assets.xcassets */; };
 		FB315BF126360A3800F032E8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FB315BEF26360A3800F032E8 /* LaunchScreen.storyboard */; };
 		FB315BF926361BC800F032E8 /* ContactTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB315BF826361BC800F032E8 /* ContactTableViewController.swift */; };
+		FB315BFC2638EFD500F032E8 /* CoreDataContact.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FB315BFA2638EFD500F032E8 /* CoreDataContact.xcdatamodeld */; };
+		FB315BFE2638F22F00F032E8 /* AddNewContactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB315BFD2638F22F00F032E8 /* AddNewContactViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,8 @@
 		FB315BF026360A3800F032E8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FB315BF226360A3800F032E8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FB315BF826361BC800F032E8 /* ContactTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactTableViewController.swift; sourceTree = "<group>"; };
+		FB315BFB2638EFD500F032E8 /* CoreDataContact.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataContact.xcdatamodel; sourceTree = "<group>"; };
+		FB315BFD2638F22F00F032E8 /* AddNewContactViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNewContactViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +67,8 @@
 				FB315BEF26360A3800F032E8 /* LaunchScreen.storyboard */,
 				FB315BF226360A3800F032E8 /* Info.plist */,
 				FB315BF826361BC800F032E8 /* ContactTableViewController.swift */,
+				FB315BFA2638EFD500F032E8 /* CoreDataContact.xcdatamodeld */,
+				FB315BFD2638F22F00F032E8 /* AddNewContactViewController.swift */,
 			);
 			path = ContactApp;
 			sourceTree = "<group>";
@@ -141,6 +147,8 @@
 				FB315BE926360A3700F032E8 /* ViewController.swift in Sources */,
 				FB315BE726360A3700F032E8 /* AppDelegate.swift in Sources */,
 				FB315BF926361BC800F032E8 /* ContactTableViewController.swift in Sources */,
+				FB315BFC2638EFD500F032E8 /* CoreDataContact.xcdatamodeld in Sources */,
+				FB315BFE2638F22F00F032E8 /* AddNewContactViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -338,6 +346,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		FB315BFA2638EFD500F032E8 /* CoreDataContact.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				FB315BFB2638EFD500F032E8 /* CoreDataContact.xcdatamodel */,
+			);
+			currentVersion = FB315BFB2638EFD500F032E8 /* CoreDataContact.xcdatamodel */;
+			path = CoreDataContact.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = FB315BDB26360A3700F032E8 /* Project object */;
 }

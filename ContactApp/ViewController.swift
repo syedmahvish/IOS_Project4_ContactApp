@@ -10,6 +10,7 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    @IBOutlet weak var uploadPhotoButton: UIButton!
     
     @IBOutlet weak var profilePictureImageView: UIImageView!
     
@@ -19,13 +20,27 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var emailTextField: UITextField!
     
+    var isEditModeOn = false
+    
     var person = Person()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupGesture()
+        setEditMode()
+    }
+    
+    func setupGesture(){
         var gesture = UITapGestureRecognizer(target: self, action: #selector(dismissView))
         gesture.cancelsTouchesInView = false
         self.view.addGestureRecognizer(gesture)
+    }
+    
+    func setEditMode(){
+        nameTextField.isUserInteractionEnabled = isEditModeOn
+        mobileTextField.isUserInteractionEnabled = isEditModeOn
+        emailTextField.isUserInteractionEnabled = isEditModeOn
+        uploadPhotoButton.isHidden = !isEditModeOn
     }
     
     @objc func dismissView(){

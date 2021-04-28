@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 struct Person{
     var imageURLThumbnail : String?
@@ -15,6 +16,7 @@ struct Person{
     var email : String?
     var number : String?
     var id : String?
+    var imageData : Data?
     
     var userDefault = UserDefaults(suiteName: "seedStore")
     
@@ -113,6 +115,7 @@ class ContactTableViewController: UITableViewController {
     var searchController = UISearchController(searchResultsController: nil)
     var sectioncontactlist = [(Character,  [Person])]()
     var currPerson = Person()
+    var isEditModeOn = false
     
     var searchEmpty : Bool {
         return searchController.searchBar.text?.isEmpty ?? true
@@ -125,36 +128,83 @@ class ContactTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupSearchController()
+        fetchCoreData()
+        loadData()
         loadContactList()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        //fetchCoreData()
+        //loadData()
     }
     
     // MARK: - initial contact list setup
     
+    func loadData(){
+        self.sectioncontactlist = Dictionary(grouping: self.contactList) { (contact) -> Character in
+            var fchar : Character?
+            if let name = contact.name as? String{
+                fchar = name.first!
+            }
+            return fchar!
+            }
+            .map { (key: Character, value: [Person]) -> (letter: Character, countries: [Person]) in
+                (letter: key, countries: value)
+            }
+            .sorted { (left, right) -> Bool in
+                left.letter < right.letter
+        }
+
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
+    
     func loadContactList(){
         DispatchQueue.global().async {
-            Person().getContactList {[unowned self] (data) in
-                self.contactList = data
-                
-                self.sectioncontactlist = Dictionary(grouping: self.contactList) { (contact) -> Character in
-                    var fchar : Character?
-                    if let name = contact.name as? String{
-                        fchar = name.first!
-                    }
-                    return fchar!
-                    }
-                    .map { (key: Character, value: [Person]) -> (letter: Character, countries: [Person]) in
-                        (letter: key, countries: value)
-                    }
-                    .sorted { (left, right) -> Bool in
-                        left.letter < right.letter
-                }
-                
-                
-                
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
+            Person().getContactList { (data) in
+                self.contactList.append(contentsOf: data)
+                self.loadData()
             }
+        }
+    }
+    
+    func fetchCoreData(){
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate
+            else { return }
+        
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Contact")
+        
+        do{
+          let objects = try managedContext.fetch(fetchRequest)
+            for obj in objects{
+                
+                var contact = Person()
+                
+                if let id = obj.objectID as? NSManagedObjectID,
+                    let idString = id as? String{
+                    contact.id = idString
+                }
+                if let name = obj.value(forKeyPath: "name") as? String{
+                    contact.name = name
+                }
+                if let email = obj.value(forKeyPath: "email") as? String{
+                    contact.email = email
+                }
+                if let cell = obj.value(forKeyPath: "cell") as? String{
+                    contact.number = cell
+                }
+                if let imageData = obj.value(forKeyPath: "picture") as? Data{
+                    contact.imageData = imageData
+                }
+                contactList.append(contact)
+            }
+          print(contactList)
+        }catch{
+            
         }
     }
     
@@ -221,11 +271,16 @@ class ContactTableViewController: UITableViewController {
         if let id = contact.id as? String,
             let image = cacheImage[id] as? UIImage{
             cell.imageView?.image = image
-        }else{
-            let imageUrl = URL(string: contact.imageURLThumbnail!)
+        }else if let imageData = contact.imageData as? Data{
+            DispatchQueue.main.async {
+                cell.imageView?.image = UIImage(data: imageData)
+               // self.cacheImage[contact.id!] = cell.imageView?.image
+            }
+        }else if let thumnail = contact.imageURLThumbnail as? String,
+            let imageUrl = URL(string: thumnail){
             DispatchQueue.global().async {
                 do{
-                    let data = try Data(contentsOf: imageUrl!)
+                    let data = try Data(contentsOf: imageUrl)
                     if let imageData = data as? Data{
                         DispatchQueue.main.async {
                            
@@ -286,6 +341,10 @@ class ContactTableViewController: UITableViewController {
     */
 
     
+    @IBAction func addNewContactButtonTapped(_ sender: UIBarButtonItem) {
+        performSegue(withIdentifier: "AddNewContactSegue", sender: nil)
+    }
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -294,8 +353,7 @@ class ContactTableViewController: UITableViewController {
             vc.person = currPerson
         }
     }
-    
-
+  
 }
 
 class ContactTableViewCell : UITableViewCell{
@@ -311,4 +369,8 @@ extension ContactTableViewController : UISearchResultsUpdating{
             filterSearch(for: text)
         }
     }
+}
+
+extension ContactTableViewController{
+    
 }
