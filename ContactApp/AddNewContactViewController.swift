@@ -20,7 +20,7 @@ class AddNewContactViewController: UIViewController {
     
     var imagePhotoLoader = UIImagePickerController()
     
-   // var contactTableView = ContactTableViewController()
+    var contactTableView : ContactTableViewController?
     
     var newPerson = Person()
     
@@ -76,7 +76,13 @@ class AddNewContactViewController: UIViewController {
 
             do{
                 try managedContext.save()
-                dismiss(animated: true, completion:nil)
+                if let contactVC = self.contactTableView as? ContactTableViewController{
+                    contactVC.loadNewData()
+                }
+                
+                dismiss(animated: true, completion: { () in
+                   
+                });
             }catch{}
         }
     }

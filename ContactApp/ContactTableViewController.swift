@@ -139,6 +139,11 @@ class ContactTableViewController: UITableViewController {
         //loadData()
     }
     
+    func loadNewData(){
+        fetchCoreData()
+        loadData()
+    }
+    
     // MARK: - initial contact list setup
     
     func loadData(){
@@ -349,7 +354,12 @@ class ContactTableViewController: UITableViewController {
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let vc = segue.destination as? ViewController{
+        if let navigation = segue.destination as? UINavigationController,
+            let arrayVC = navigation.viewControllers as? [UIViewController],
+            let newVC = arrayVC[0] as? AddNewContactViewController {
+            newVC.contactTableView = self
+        }
+        else if let vc = segue.destination as? ViewController{
             vc.person = currPerson
         }
     }
